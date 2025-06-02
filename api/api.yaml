@@ -1,0 +1,103 @@
+openapi: 3.0.0
+info:
+  title: Besart Gallery API
+  description: API to perform BESArt gallery functionality
+  version: 1.0.0
+tags:
+  - name: auth
+    description: Endpoints for authentication
+  - name: products
+    description: Endpoints for products
+paths:
+  /products:
+    get:
+      tags:
+        - products
+      summary: Get product listing
+      description: Get product listing
+      operationId: ProductListGet
+      parameters:
+        - $ref: '#/components/parameters/OptionalPageParam'
+      security:
+        - BearerAuth: ['list-product']
+      responses:
+        '200':
+          description: Success - Return product listing
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductListGetResponse'
+        '500':
+          description: Error - Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DefaultErrorResponse'
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: |
+        Authorization using header parameter with parameter name `Authorization`
+        See: https://swagger.io/docs/specification/authentication/bearer-authentication/
+      bearerFormat: Bearer <token>
+  parameters:
+    OptionalPageParam:
+      name: page
+      in: query
+      required: false
+      description: paginate result
+      schema:
+        type: integer
+      x-oapi-codegen-extra-tags:
+        validate: omitempty,gt=0
+  schemas:
+    DefaultErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          description: error description
+          example: failed to validate nama field
+    ProductListGetResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/ProductListGetResponseItem'
+    ProductListGetResponseItem:
+      type: object
+      required:
+        - id
+        - name
+        - image
+        - rating
+        - discountedPrice
+        - originalPrice
+      properties:
+        id:
+          type: string
+          description: id of product
+          example: 32bf67e5-4971-47ce-985c-44b6b3860cdb
+        name:
+          type: string
+          description: Product name
+          example: Sunset Over Still Waters
+        image:
+          type: string
+          description: Product image
+          example: https://template.getbazaar.io/_next/image?url=%2Fassets%2Fimages%2Ffurniture-products%2Ffurniture-8.png&w=828&q=75
+        rating:
+          type: integer
+          description: Product rating
+          example: 4
+          format: float64
+        discountedPrice:
+          type: integer
+          description: Product discounted price
+          example: 10000000
+        originalPrice:
+          type: integer
+          description: Product original price
+          example: 15000000

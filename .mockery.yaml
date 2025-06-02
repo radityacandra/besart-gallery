@@ -1,0 +1,8 @@
+all: true
+with-expecter: true
+recursive: true
+keeptree: true
+packages:
+  gitlab.com/dansmp-ht-4/radityacandra/dans_golang:
+    config:
+      dir: mocks/{{ replaceAll .InterfaceDirRelative "internal" "internal_" }}
