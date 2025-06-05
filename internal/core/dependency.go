@@ -47,12 +47,13 @@ func (d *Dependency) GracefulShutdown(ctx context.Context) int {
 	}
 
 	err = d.Logger.Sync()
-	if err != nil && !errors.Is(err, syscall.ENOTTY) {
+	if err != nil && !errors.Is(err, syscall.ENOTTY) && !errors.Is(err, syscall.EINVAL) {
 		d.Logger.Error("failed to flush log", zap.Error(err))
 		code = 1
 	} else {
 		d.Logger.Info("success to flush log")
 	}
 
+	d.Logger.Info("shutted down", zap.Any("code", code))
 	return code
 }

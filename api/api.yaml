@@ -8,6 +8,8 @@ tags:
     description: Endpoints for authentication
   - name: products
     description: Endpoints for products
+  - name: order
+    description: Endpoints for order management
 paths:
   /products:
     get:
@@ -18,8 +20,6 @@ paths:
       operationId: ProductListGet
       parameters:
         - $ref: '#/components/parameters/OptionalPageParam'
-      security:
-        - BearerAuth: ['list-product']
       responses:
         '200':
           description: Success - Return product listing
@@ -29,6 +29,55 @@ paths:
                 $ref: '#/components/schemas/ProductListGetResponse'
         '500':
           description: Error - Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DefaultErrorResponse'
+  /products/{product_id}:
+    get:
+      tags:
+        - products
+      summary: Get product detail
+      description: Get product detail
+      operationId: ProductDetailGet
+      parameters:
+        - $ref: '#/components/parameters/ProductIdPathParams'
+      responses:
+        '200':
+          description: Success - Return product detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductDetailGetResponse'
+        '404':
+          description: Error - Product not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DefaultErrorResponse'
+  /orders:
+    post:
+      tags:
+        - order
+      summary: Create new order
+      description: Create new order (open)
+      operationId: OrderCreatePost
+      security:
+        - BearerAuth: ['create-order']
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderCreatePostRequest'
+      responses:
+        '200':
+          description: Success - Return order id and number (promised)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderCreatePostResponse'
+        '404':
+          description: Error - Product not found
           content:
             application/json:
               schema:
@@ -52,6 +101,15 @@ components:
         type: integer
       x-oapi-codegen-extra-tags:
         validate: omitempty,gt=0
+    ProductIdPathParams:
+      name: product_id
+      in: path
+      required: true
+      description: id of the product
+      schema:
+        type: string
+      x-oapi-codegen-extra-tags:
+        validate: required,uuid
   schemas:
     DefaultErrorResponse:
       type: object
@@ -101,3 +159,121 @@ components:
           type: integer
           description: Product original price
           example: 15000000
+    ProductDetailGetResponse:
+      type: object
+      required:
+        - id
+        - name
+        - image
+        - rating
+        - discountedPrice
+        - originalPrice
+        - description
+        - dimension
+        - medium
+      properties:
+        id:
+          type: string
+          description: id of product
+          example: 32bf67e5-4971-47ce-985c-44b6b3860cdb
+        name:
+          type: string
+          description: Product name
+          example: Sunset Over Still Waters
+        image:
+          type: string
+          description: Product image
+          example: https://template.getbazaar.io/_next/image?url=%2Fassets%2Fimages%2Ffurniture-products%2Ffurniture-8.png&w=828&q=75
+        rating:
+          type: integer
+          description: Product rating
+          example: 4
+          format: float64
+        discountedPrice:
+          type: integer
+          description: Product discounted price
+          example: 10000000
+        originalPrice:
+          type: integer
+          description: Product original price
+          example: 15000000
+        description:
+          type: string
+          description: Product description
+          example: Lorem ipsum dolor sit amet\nconsectetur adipiscing elit\nsed do eiusmod tempor incididunt ut labore et dolore magna aliqua
+        dimension:
+          type: string
+          description: Product dimension
+          example: 120 x 80 cm
+        medium:
+          type: string
+          description: Art medium
+          example: Oil Painting on Canvas
+    OrderCreatePostRequest:
+      type: object
+      required:
+        - shipping
+        - orderItems
+      properties:
+        shipping:
+          $ref: '#/components/schemas/ShippingAddressRequest'
+        orderItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItemRequest'
+    ShippingAddressRequest:
+      type: object
+      required:
+        - fullName
+        - phoneNumber
+        - fullAddress
+      properties:
+        fullName:
+          type: string
+          description: contactable receiver full name
+          example: John Doe
+          x-oapi-codegen-extra-tags:
+            validate: required
+        phoneNumber:
+          type: string
+          description: contactable receiver phone number
+          example: "+6281123456789"
+          x-oapi-codegen-extra-tags:
+            validate: required
+        fullAddress:
+          type: string
+          description: receiver full address
+          example: 123 Giggle Ave, Richmond, VA 22548
+          x-oapi-codegen-extra-tags:
+            validate: required
+        notes:
+          type: string
+          description: additional shipping notes
+          example: please just put on terrace
+    OrderItemRequest:
+      type: object
+      required:
+        - productId
+        - amount
+      properties:
+        productId:
+          type: string
+          description: id of the product
+          example: bf6b22f4-ed76-4872-acbd-43f3910c796e
+          x-oapi-codegen-extra-tags:
+            validate: required,uuid
+        amount:
+          type: integer
+          description: order amount
+          example: 1
+          x-oapi-codegen-extra-tags:
+            validate: required
+    OrderCreatePostResponse:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          description: id of the order (uuid)
+          example: bf6b22f4-ed76-4872-acbd-43f3910c796e

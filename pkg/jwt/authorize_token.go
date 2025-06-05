@@ -11,8 +11,8 @@ import (
 )
 
 const (
-	ISSUER      = "DAnS-Challenge"
-	AUDIENCE    = "DAnS-Challenge"
+	ISSUER      = "http://localhost:8080/realms/myrealm"
+	AUDIENCE    = "account"
 	CONTEXT_KEY = "token_data"
 )
 
@@ -23,7 +23,7 @@ func AuthorizeToken(ctx context.Context, authorizationStr string) (map[string]in
 	}
 	tokenStr := authPart[1]
 
-	url := "http://localhost:8080/auth/realms/myrealm/protocol/openid-connect/certs"
+	url := "http://localhost:8080/realms/myrealm/protocol/openid-connect/certs"
 	jwks, err := keyfunc.NewDefaultCtx(ctx, []string{url})
 	if err != nil {
 		return nil, types.NewAuthorizationError("failed to create JWK Set")
@@ -43,10 +43,6 @@ func AuthorizeToken(ctx context.Context, authorizationStr string) (map[string]in
 	}
 
 	claim := token.Claims.(jwt.MapClaims)
-	// validate nbf claim
-	if nbf, err := claim.GetNotBefore(); err != nil || nbf.Unix() > time.Now().Unix() {
-		return nil, types.NewAuthorizationError("invalid token")
-	}
 
 	// validate expired claim
 	if exp, err := claim.GetExpirationTime(); err != nil || exp.Unix() < time.Now().Unix() {

@@ -7,10 +7,7 @@ import (
 )
 
 type Config struct {
-	PostgresUri    string `env:"POSTGRES_URI"`
-	JwtPrivateKey  string `env:"JWT_PRIVATE_KEY"`
-	JwtPublicKey   string `env:"JWT_PUBLIC_KEY"`
-	JobListBaseUrl string `env:"JOB_LIST_BASE_URL" env-default:"https://dev6.dansmultipro.com"`
+	PostgresUri string `env:"POSTGRES_URI"`
 }
 
 func LoadConfig(logger *zap.Logger) (*Config, error) {

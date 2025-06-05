@@ -11,5 +11,5 @@ FROM alpine:latest
 
 # We need to copy the binary from the build image to the production image.
 COPY --from=build /app .
-EXPOSE 8080
+EXPOSE 9000
 CMD [ "/app" ]

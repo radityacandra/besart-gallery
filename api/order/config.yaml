@@ -1,0 +1,5 @@
+package: order
+output: ./order/orderApi.gen.go
+generate:
+  models: true
+  echo-server: true

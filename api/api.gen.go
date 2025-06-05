@@ -13,6 +13,57 @@ type DefaultErrorResponse struct {
 	Error string `json:"error"`
 }
 
+// OrderCreatePostRequest defines model for OrderCreatePostRequest.
+type OrderCreatePostRequest struct {
+	OrderItems []OrderItemRequest     `json:"orderItems"`
+	Shipping   ShippingAddressRequest `json:"shipping"`
+}
+
+// OrderCreatePostResponse defines model for OrderCreatePostResponse.
+type OrderCreatePostResponse struct {
+	// Id id of the order (uuid)
+	Id string `json:"id"`
+}
+
+// OrderItemRequest defines model for OrderItemRequest.
+type OrderItemRequest struct {
+	// Amount order amount
+	Amount int `json:"amount" validate:"required"`
+
+	// ProductId id of the product
+	ProductId string `json:"productId" validate:"required,uuid"`
+}
+
+// ProductDetailGetResponse defines model for ProductDetailGetResponse.
+type ProductDetailGetResponse struct {
+	// Description Product description
+	Description string `json:"description"`
+
+	// Dimension Product dimension
+	Dimension string `json:"dimension"`
+
+	// DiscountedPrice Product discounted price
+	DiscountedPrice int `json:"discountedPrice"`
+
+	// Id id of product
+	Id string `json:"id"`
+
+	// Image Product image
+	Image string `json:"image"`
+
+	// Medium Art medium
+	Medium string `json:"medium"`
+
+	// Name Product name
+	Name string `json:"name"`
+
+	// OriginalPrice Product original price
+	OriginalPrice int `json:"originalPrice"`
+
+	// Rating Product rating
+	Rating int `json:"rating"`
+}
+
 // ProductListGetResponse defines model for ProductListGetResponse.
 type ProductListGetResponse = []ProductListGetResponseItem
 
@@ -37,11 +88,32 @@ type ProductListGetResponseItem struct {
 	Rating int `json:"rating"`
 }
 
+// ShippingAddressRequest defines model for ShippingAddressRequest.
+type ShippingAddressRequest struct {
+	// FullAddress receiver full address
+	FullAddress string `json:"fullAddress" validate:"required"`
+
+	// FullName contactable receiver full name
+	FullName string `json:"fullName" validate:"required"`
+
+	// Notes additional shipping notes
+	Notes *string `json:"notes,omitempty"`
+
+	// PhoneNumber contactable receiver phone number
+	PhoneNumber string `json:"phoneNumber" validate:"required"`
+}
+
 // OptionalPageParam defines model for OptionalPageParam.
 type OptionalPageParam = int
+
+// ProductIdPathParams defines model for ProductIdPathParams.
+type ProductIdPathParams = string
 
 // ProductListGetParams defines parameters for ProductListGet.
 type ProductListGetParams struct {
 	// Page paginate result
 	Page *OptionalPageParam `form:"page,omitempty" json:"page,omitempty" validate:"omitempty,gt=0"`
 }
+
+// OrderCreatePostJSONRequestBody defines body for OrderCreatePost for application/json ContentType.
+type OrderCreatePostJSONRequestBody = OrderCreatePostRequest
