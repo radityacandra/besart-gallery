@@ -39,3 +39,16 @@ type CreateOrderRepoInput struct {
 	CreatedAt  int64           `db:"created_at"`
 	CreatedBy  string          `db:"created_by"`
 }
+
+type UpdateStatusInput struct {
+	Status  string
+	UserId  string
+	OrderId string
+}
+
+type UpdateOrderStatusInput struct {
+	OrderId   string `db:"id"`
+	Status    string `db:"status"`
+	UpdatedAt int64  `db:"updated_at"`
+	UpdatedBy string `db:"updated_by"`
+}

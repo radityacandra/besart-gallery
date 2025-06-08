@@ -4,7 +4,11 @@
 package order
 
 import (
+	"fmt"
+	"net/http"
+
 	"github.com/labstack/echo/v4"
+	"github.com/oapi-codegen/runtime"
 )
 
 const (
@@ -38,6 +42,12 @@ type OrderItemRequest struct {
 	ProductId string `json:"productId" validate:"required,uuid"`
 }
 
+// OrderStatusPutRequest defines model for OrderStatusPutRequest.
+type OrderStatusPutRequest struct {
+	// Status order status to be updated
+	Status string `json:"status" validate:"required,oneof=confirmed"`
+}
+
 // ShippingAddressRequest defines model for ShippingAddressRequest.
 type ShippingAddressRequest struct {
 	// FullAddress receiver full address
@@ -53,14 +63,23 @@ type ShippingAddressRequest struct {
 	PhoneNumber string `json:"phoneNumber" validate:"required"`
 }
 
+// OrderIdPathParams defines model for OrderIdPathParams.
+type OrderIdPathParams = string
+
 // OrderCreatePostJSONRequestBody defines body for OrderCreatePost for application/json ContentType.
 type OrderCreatePostJSONRequestBody = OrderCreatePostRequest
+
+// OrderStatusPutJSONRequestBody defines body for OrderStatusPut for application/json ContentType.
+type OrderStatusPutJSONRequestBody = OrderStatusPutRequest
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 	// Create new order
 	// (POST /orders)
 	OrderCreatePost(ctx echo.Context) error
+	// Update order status
+	// (PUT /orders/{order_id}/status)
+	OrderStatusPut(ctx echo.Context, orderId OrderIdPathParams) error
 }
 
 // ServerInterfaceWrapper converts echo contexts to parameters.
@@ -76,6 +95,24 @@ func (w *ServerInterfaceWrapper) OrderCreatePost(ctx echo.Context) error {
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.OrderCreatePost(ctx)
+	return err
+}
+
+// OrderStatusPut converts echo context to params.
+func (w *ServerInterfaceWrapper) OrderStatusPut(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "order_id" -------------
+	var orderId OrderIdPathParams
+
+	err = runtime.BindStyledParameterWithOptions("simple", "order_id", ctx.Param("order_id"), &orderId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter order_id: %s", err))
+	}
+
+	ctx.Set(BearerAuthScopes, []string{"update-order-status"})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.OrderStatusPut(ctx, orderId)
 	return err
 }
 
@@ -108,5 +145,6 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	}
 
 	router.POST(baseURL+"/orders", wrapper.OrderCreatePost)
+	router.PUT(baseURL+"/orders/:order_id/status", wrapper.OrderStatusPut)
 
 }

@@ -10,6 +10,7 @@ import (
 
 type IService interface {
 	CreateOrder(ctx context.Context, input types.CreateOrderInput) (string, error)
+	UpdateStatus(ctx context.Context, input types.UpdateStatusInput) error
 }
 
 type Service struct {

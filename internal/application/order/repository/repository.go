@@ -9,6 +9,8 @@ import (
 
 type IRepository interface {
 	CreateOrder(ctx context.Context, input types.CreateOrderRepoInput) error
+	FindOrderByIdAndUserId(ctx context.Context, orderId, userId string) (types.CreateOrderRepoInput, error)
+	UpdateOrderStatusById(ctx context.Context, input types.UpdateOrderStatusInput) error
 }
 
 type Repository struct {

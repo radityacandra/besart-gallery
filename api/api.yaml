@@ -82,6 +82,35 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DefaultErrorResponse'
+  /orders/{order_id}/status:
+    put:
+      tags:
+        - order
+      summary: Update order status
+      description: Update order status
+      operationId: OrderStatusPut
+      security:
+        - BearerAuth: ['update-order-status']
+      parameters:
+        - $ref: '#/components/parameters/OrderIdPathParams'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderStatusPutRequest'
+      responses:
+        '200':
+          description: Success - Return order id and number (promised)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderCreatePostResponse'
+        '404':
+          description: Error - Product not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DefaultErrorResponse'
 components:
   securitySchemes:
     BearerAuth:
@@ -106,6 +135,15 @@ components:
       in: path
       required: true
       description: id of the product
+      schema:
+        type: string
+      x-oapi-codegen-extra-tags:
+        validate: required,uuid
+    OrderIdPathParams:
+      name: order_id
+      in: path
+      required: true
+      description: id of the order
       schema:
         type: string
       x-oapi-codegen-extra-tags:
@@ -277,3 +315,14 @@ components:
           type: string
           description: id of the order (uuid)
           example: bf6b22f4-ed76-4872-acbd-43f3910c796e
+    OrderStatusPutRequest:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          description: order status to be updated
+          example: confirmed
+          x-oapi-codegen-extra-tags:
+            validate: required,oneof=confirmed

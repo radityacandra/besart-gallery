@@ -34,6 +34,12 @@ type OrderItemRequest struct {
 	ProductId string `json:"productId" validate:"required,uuid"`
 }
 
+// OrderStatusPutRequest defines model for OrderStatusPutRequest.
+type OrderStatusPutRequest struct {
+	// Status order status to be updated
+	Status string `json:"status" validate:"required,oneof=confirmed"`
+}
+
 // ProductDetailGetResponse defines model for ProductDetailGetResponse.
 type ProductDetailGetResponse struct {
 	// Description Product description
@@ -106,6 +112,9 @@ type ShippingAddressRequest struct {
 // OptionalPageParam defines model for OptionalPageParam.
 type OptionalPageParam = int
 
+// OrderIdPathParams defines model for OrderIdPathParams.
+type OrderIdPathParams = string
+
 // ProductIdPathParams defines model for ProductIdPathParams.
 type ProductIdPathParams = string
 
@@ -117,3 +126,6 @@ type ProductListGetParams struct {
 
 // OrderCreatePostJSONRequestBody defines body for OrderCreatePost for application/json ContentType.
 type OrderCreatePostJSONRequestBody = OrderCreatePostRequest
+
+// OrderStatusPutJSONRequestBody defines body for OrderStatusPut for application/json ContentType.
+type OrderStatusPutJSONRequestBody = OrderStatusPutRequest
