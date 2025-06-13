@@ -18,5 +18,20 @@ func (r *Repository) FindOrderByIdAndUserId(ctx context.Context, orderId, userId
 		return types.CreateOrderRepoInput{}, err
 	}
 
+	rows, err := r.Db.QueryxContext(ctx, `SELECT id, order_id, product_id, quantity, created_at, created_by FROM public.order_items WHERE order_id = $1`, orderId)
+	if err != nil {
+		return types.CreateOrderRepoInput{}, err
+	}
+
+	result.OrderItems = []types.OrderItemRepo{}
+	for rows.Next() {
+		var orderItem types.OrderItemRepo
+		if err := rows.StructScan(&orderItem); err != nil {
+			return types.CreateOrderRepoInput{}, err
+		}
+
+		result.OrderItems = append(result.OrderItems, orderItem)
+	}
+
 	return result, nil
 }

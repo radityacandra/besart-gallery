@@ -25,6 +25,20 @@ type OrderCreatePostResponse struct {
 	Id string `json:"id"`
 }
 
+// OrderDetailGetResponse defines model for OrderDetailGetResponse.
+type OrderDetailGetResponse struct {
+	// Id id of the order
+	Id         string              `json:"id"`
+	OrderItems []OrderItemResponse `json:"orderItems"`
+
+	// OrderTime order creation time (in unix millis)
+	OrderTime int64                  `json:"orderTime"`
+	Shipping  ShippingAddressRequest `json:"shipping"`
+
+	// Status order status
+	Status string `json:"status"`
+}
+
 // OrderItemRequest defines model for OrderItemRequest.
 type OrderItemRequest struct {
 	// Amount order amount
@@ -34,10 +48,58 @@ type OrderItemRequest struct {
 	ProductId string `json:"productId" validate:"required,uuid"`
 }
 
+// OrderItemResponse defines model for OrderItemResponse.
+type OrderItemResponse struct {
+	// Id id of the order item
+	Id string `json:"id"`
+
+	// ProductImage product image in full accessible url
+	ProductImage string `json:"productImage"`
+
+	// ProductName product name
+	ProductName string `json:"productName"`
+
+	// ProductPrice product price
+	ProductPrice int64 `json:"productPrice"`
+
+	// Qty order quantity for this product
+	Qty int `json:"qty"`
+}
+
+// OrderListGetDetail defines model for OrderListGetDetail.
+type OrderListGetDetail struct {
+	// Id id of the order
+	Id string `json:"id"`
+
+	// Status latest order status
+	Status string `json:"status"`
+
+	// TotalAmount total order amount
+	TotalAmount int64 `json:"totalAmount"`
+}
+
+// OrderListGetResponse defines model for OrderListGetResponse.
+type OrderListGetResponse struct {
+	Data       []OrderListGetDetail `json:"data"`
+	Pagination PaginationSchema     `json:"pagination"`
+}
+
 // OrderStatusPutRequest defines model for OrderStatusPutRequest.
 type OrderStatusPutRequest struct {
 	// Status order status to be updated
 	Status string `json:"status" validate:"required,oneof=confirmed"`
+}
+
+// PaginationSchema defines model for PaginationSchema.
+type PaginationSchema struct {
+	// Page current active page
+	Page int `json:"page"`
+
+	// PageSize number of active data in the page
+	PageSize int `json:"pageSize"`
+
+	// TotalData total data available to be outputted. meaning that max page is 1000 (totalData / pageSize)
+	TotalData int64 `json:"totalData"`
 }
 
 // ProductDetailGetResponse defines model for ProductDetailGetResponse.
@@ -123,6 +185,9 @@ type ProductListGetParams struct {
 	// Page paginate result
 	Page *OptionalPageParam `form:"page,omitempty" json:"page,omitempty" validate:"omitempty,gt=0"`
 }
+
+// OrderListGetJSONRequestBody defines body for OrderListGet for application/json ContentType.
+type OrderListGetJSONRequestBody = OrderCreatePostRequest
 
 // OrderCreatePostJSONRequestBody defines body for OrderCreatePost for application/json ContentType.
 type OrderCreatePostJSONRequestBody = OrderCreatePostRequest

@@ -52,3 +52,42 @@ type UpdateOrderStatusInput struct {
 	UpdatedAt int64  `db:"updated_at"`
 	UpdatedBy string `db:"updated_by"`
 }
+
+type ListOrderInput struct {
+	UserId   string
+	Page     int
+	PageSize int
+}
+
+type ListOrderOutput struct {
+	Data       []OrderOutput
+	Pagination Pagination
+}
+
+type OrderOutput struct {
+	Id          string `db:"id"`
+	Status      string `db:"status"`
+	TotalAmount int64  `db:"total_amount"`
+}
+
+type Pagination struct {
+	Page      int
+	PageSize  int
+	TotalData int64
+}
+
+type DetailOrderOutput struct {
+	Id           string
+	OrderTime    int64
+	Status       string
+	ShippingInfo ShippingInfo
+	OrderItems   []OrderItemDetail
+}
+
+type OrderItemDetail struct {
+	Id           string
+	ProductImage string
+	ProductName  string
+	Quantity     int
+	ProductPrice int64
+}

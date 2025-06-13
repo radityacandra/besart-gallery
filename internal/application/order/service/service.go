@@ -11,6 +11,8 @@ import (
 type IService interface {
 	CreateOrder(ctx context.Context, input types.CreateOrderInput) (string, error)
 	UpdateStatus(ctx context.Context, input types.UpdateStatusInput) error
+	ListOrder(ctx context.Context, input types.ListOrderInput) (types.ListOrderOutput, error)
+	DetailOrder(ctx context.Context, userId, orderId string) (types.DetailOrderOutput, error)
 }
 
 type Service struct {

@@ -82,6 +82,54 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DefaultErrorResponse'
+    get:
+      tags:
+        - order
+      summary: Get order list
+      description: Listing of created order by authenticated user
+      operationId: OrderListGet
+      security:
+        - BearerAuth: ['list-order']
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderCreatePostRequest'
+      responses:
+        '200':
+          description: Success - Return order id and number (promised)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderListGetResponse'
+        '500':
+          description: Error - Unknown Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DefaultErrorResponse'
+  /orders/{order_id}:
+    get:
+      tags:
+        - order
+      summary: Get order detail
+      description: Get order detail
+      operationId: OrderDetailGet
+      parameters:
+        - $ref: '#/components/parameters/OrderIdPathParams'
+      responses:
+        '200':
+          description: Success - Return product detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderDetailGetResponse'
+        '404':
+          description: Error - Order not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DefaultErrorResponse'      
   /orders/{order_id}/status:
     put:
       tags:
@@ -326,3 +374,113 @@ components:
           example: confirmed
           x-oapi-codegen-extra-tags:
             validate: required,oneof=confirmed
+    OrderListGetResponse:
+      type: object
+      required:
+        - data
+        - pagination
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderListGetDetail'
+        pagination:
+          $ref: '#/components/schemas/PaginationSchema'
+    OrderListGetDetail:
+      type: object
+      required:
+        - id
+        - totalAmount
+        - status
+      properties:
+        id:
+          type: string
+          description: id of the order
+          example: 1a2af919-ac78-4e1b-93ac-4b46482422aa
+        totalAmount:
+          type: integer
+          format: int64
+          description: total order amount
+          example: 10000000
+        status:
+          type: string
+          description: latest order status
+          example: open
+    PaginationSchema:
+      type: object
+      required:
+        - page
+        - pageSize
+        - totalData
+      properties:
+        page:
+          type: integer
+          description: current active page
+          example: 1
+        pageSize:
+          type: integer
+          description: number of active data in the page
+          example: 10
+        totalData:
+          type: integer
+          format: int64
+          description: total data available to be outputted. meaning that max page is 1000 (totalData / pageSize)
+          example: 10000
+    OrderDetailGetResponse:
+      type: object
+      required:
+        - id
+        - orderTime
+        - status
+        - shipping
+        - orderItems
+      properties:
+        id:
+          type: string
+          description: id of the order
+          example: 1a2af919-ac78-4e1b-93ac-4b46482422aa
+        orderTime:
+          type: integer
+          format: int64
+          description: order creation time (in unix millis)
+          example: 1749703960000
+        status:
+          type: string
+          description: order status
+          example: open
+        shipping:
+          $ref: '#/components/schemas/ShippingAddressRequest'
+        orderItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItemResponse'
+    OrderItemResponse:
+      type: object
+      required:
+        - id
+        - productImage
+        - productName
+        - qty
+        - productPrice
+      properties:
+        id: 
+          type: string
+          description: id of the order item
+          example: 887e8ac8-98d5-4823-88ec-a59fa804b7af
+        productImage:
+          type: string
+          description: product image in full accessible url
+          example: https://besarts.biz.id/assets/image.jpg
+        productName:
+          type: string
+          description: product name
+          example: Some Product Name
+        qty:
+          type: integer
+          description: order quantity for this product
+          example: 1
+        productPrice:
+          type: integer
+          format: int64
+          description: product price
+          example: 10000000
